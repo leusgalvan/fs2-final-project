@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 import java.util
 
-object FakeChannel {
+object FakeSocketChannel {
   class DummyChannel extends SocketChannel(null) {
     override def bind(local: SocketAddress): SocketChannel = ???
 
@@ -37,7 +37,7 @@ object FakeChannel {
 
     override def getLocalAddress: SocketAddress = ???
 
-    override def implCloseSelectableChannel(): Unit = ???
+    override def implCloseSelectableChannel(): Unit = ()
 
     override def implConfigureBlocking(block: Boolean): Unit = ???
 
