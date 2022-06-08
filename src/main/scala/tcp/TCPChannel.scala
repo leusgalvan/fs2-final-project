@@ -10,6 +10,7 @@ import java.nio.channels.SocketChannel
 trait TCPChannel[F[_]] {
   def stream: Stream[F, Byte]
   def write(bytes: Array[Byte]): F[Unit]
+  def close(): F[Unit]
 }
 
 object TCPChannel {
@@ -38,5 +39,7 @@ object TCPChannel {
           }
         }
       }
+
+      override def close(): F[Unit] = Sync[F].blocking(socketChannel.close())
     }
 }

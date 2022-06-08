@@ -6,7 +6,7 @@ import java.net._
 import java.nio.channels._
 
 trait TCPServer[F[_]] {
-  def stream: Stream[F, SocketChannel]
+  def stream: Stream[F, TCPChannel[F]]
 }
 
 object TCPServer {
@@ -32,13 +32,12 @@ object TCPServer {
   ): TCPServer[F] = new TCPServer[F] {
     def clientChannelResource(
         serverSocketChannel: ServerSocketChannel
-    ): Resource[F, SocketChannel] = {
-      Resource.make(Sync[F].blocking(serverSocketChannel.accept()))(s =>
-        Sync[F].blocking(s.close())
-      )
+    ): Resource[F, TCPChannel[F]] = {
+      val acquire = Sync[F].blocking(TCPChannel.fromSocketChannel(serverSocketChannel.accept()))
+      Resource.make(acquire)(_.close())
     }
 
-    override def stream: Stream[F, SocketChannel] = {
+    override def stream: Stream[F, TCPChannel[F]] = {
       Stream
         .resource(serverSocketChannel)
         .flatMap { serverSocketChannel =>
