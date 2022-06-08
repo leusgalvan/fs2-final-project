@@ -81,7 +81,7 @@ object Pipes {
                   restOfStream,
                   step,
                   idx + 1,
-                  request.copy(body = request.body ++ nextLine.getBytes)
+                  request.copy(body = request.body ++ nextLine.getBytes ++ "\n".getBytes)
                 )
           }
         }
