@@ -12,8 +12,7 @@ object Main extends IOApp.Simple {
         status = 200,
         body = request.body
       )
-    val pipes = Pipes.impl[IO]
-    val server = Server[IO](maxConnections, host, port, handleRequest, pipes)
+    val server = Server[IO](maxConnections, host, port, handleRequest)
 
     server.stream.compile.drain
   }

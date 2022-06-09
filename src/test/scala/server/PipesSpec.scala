@@ -4,7 +4,7 @@ import cats.implicits._
 import cats.effect._
 import fs2._
 
-class PipesSpec extends munit.CatsEffectSuite with SampleRequests {
+class PipesSpec extends munit.CatsEffectSuite with FakeRequests {
   test("Requests pipe can process a single GET without body") {
     val pipes = Pipes.impl[IO]
     val stream = getWithNoBodyStream

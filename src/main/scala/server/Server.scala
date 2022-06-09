@@ -19,33 +19,44 @@ object Server {
       maxConnections: Int,
       host: String,
       port: Int,
-      handleRequest: Request => Response,
-      pipes: Pipes[F]
+      handleRequest: Request => Response
   )(implicit
-    logger: Logger[F],
-    console: Console[F],
-    concurrent: Concurrent[F],
-    sync: Sync[F]
+      logger: Logger[F],
+      console: Console[F],
+      concurrent: Concurrent[F],
+      sync: Sync[F]
+  ): Server[F] = {
+    val tcpServer = TCPServer.impl[F](host, port)
+    val pipes = Pipes.impl[F]
+    make(maxConnections, handleRequest, pipes, tcpServer)
+  }
+
+  def make[F[_]: RaiseThrowable](
+      maxConnections: Int,
+      handleRequest: Request => Response,
+      pipes: Pipes[F],
+      tcpServer: TCPServer[F]
+  )(implicit
+      logger: Logger[F],
+      console: Console[F],
+      concurrent: Concurrent[F],
+      sync: Sync[F]
   ): Server[F] =
     new Server[F] {
-      val tcpServer: TCPServer[F] = TCPServer.impl[F](host, port)
-
       def connectionStream(socket: TCPChannel[F]): Stream[F, Nothing] = {
-          socket
-            .stream
-            .through(text.utf8.decode)
-            .through(text.lines)
-            .evalTap(req => console.println(req.show))(sync)
-            .through(pipes.requests)
-            .evalTap(req => console.println(req.show))(sync)
-            .map(handleRequest)
-            .evalMap(r => socket.write(r.bytes))
-            .drain
+        socket.stream
+          .through(text.utf8.decode)
+          .through(text.lines)
+          //.evalTap(req => console.println(req.show))(sync)
+          .through(pipes.requests)
+          //.evalTap(req => console.println(req.show))(sync)
+          .map(handleRequest)
+          .evalMap(r => socket.write(r.bytes))
+          .drain
       }
 
       override def stream: Stream[F, Nothing] = {
-        tcpServer
-          .stream
+        tcpServer.stream
           .map(connectionStream)
           .parJoin(maxConnections)
       }

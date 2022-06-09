@@ -1,8 +1,8 @@
 package server
 
-import fs2.{Pure, Stream}
+import fs2._
 
-trait SampleRequests {
+trait FakeRequests {
   val getWithNoBodyStream: Stream[Pure, String] = Stream(
     "GET /api/users HTTP/1.1",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)",
