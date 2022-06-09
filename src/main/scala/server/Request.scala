@@ -9,7 +9,12 @@ case class Request(
     httpVersion: String,
     headers: Map[String, String],
     body: Array[Byte]
-)
+) {
+  def contentLength: Int =
+    headers.get("Content-Length").flatMap(_.toIntOption).getOrElse(0)
+
+  override def toString: String = Request.show.show(this)
+}
 
 object Request {
   val empty = new Request("", "", "", Map.empty, Array.empty)

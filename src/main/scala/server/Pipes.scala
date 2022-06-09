@@ -20,7 +20,7 @@ object Pipes {
         if (idx >= currentChunk.size) {
           restOfStream.pull.uncons.flatMap {
             case Some((newChunk, s)) => go(newChunk, s, step, 0, request)
-            case None                => Pull.done
+            case None                => Pull.output1(request) >> Pull.done
           }
         } else {
           step match {
@@ -70,19 +70,22 @@ object Pipes {
               }
 
             case 2 => // reading body
-              val nextLine = currentChunk(idx)
-              if (nextLine.isEmpty)
-                Pull.output1(
-                  request
-                ) >> Pull.done //go(currentChunk, restOfStream, 0, idx + 1, Request.empty)
-              else
+              val leftToRead = request.contentLength - request.body.length
+              if (leftToRead <= 0) {
+                Pull.output1(request) >> Pull.done
+              } else {
+                val nextLine = currentChunk(idx)
+                val newline = if(leftToRead - nextLine.length > 0) "\n" else ""
                 go(
                   currentChunk,
                   restOfStream,
                   step,
                   idx + 1,
-                  request.copy(body = request.body ++ nextLine.getBytes ++ "\n".getBytes)
+                  request.copy(body =
+                    request.body ++ nextLine.getBytes ++ newline.getBytes
+                  )
                 )
+              }
           }
         }
       }

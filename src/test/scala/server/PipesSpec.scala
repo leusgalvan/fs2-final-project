@@ -14,7 +14,6 @@ class PipesSpec extends munit.CatsEffectSuite {
       "Accept-Language: en-us",
       "Accept-Encoding: gzip, deflate",
       "Connection: Keep-Alive",
-      "",
       ""
     )
     val expected = Request(
@@ -39,14 +38,15 @@ class PipesSpec extends munit.CatsEffectSuite {
       "GET /api/users HTTP/1.1",
       "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)",
       "Host: www.example.com",
+      "Content-Type: application/json",
+      "Content-Length: 15",
       "Accept-Language: en-us",
       "Accept-Encoding: gzip, deflate",
       "Connection: Keep-Alive",
       "",
       "{",
       """  "id": 123""",
-      "}",
-      ""
+      "}"
     )
     val expected = Request(
       method = "GET",
@@ -55,16 +55,22 @@ class PipesSpec extends munit.CatsEffectSuite {
       headers = Map(
         "User-Agent" -> "Mozilla/4.0 (compatible; MSIE5.01; Windows NT)",
         "Host" -> "www.example.com",
+        "Content-Type" -> "application/json",
+        "Content-Length" -> "15",
         "Accept-Language" -> "en-us",
         "Accept-Encoding" -> "gzip, deflate",
         "Connection" -> "Keep-Alive"
       ),
       body = """{
           |  "id": 123
-          |}
-          |""".stripMargin.getBytes
+          |}""".stripMargin.getBytes
     )
-    pipes.requests(stream).compile.toList.map(_ === List(expected)).assert
+    pipes
+      .requests(stream)
+      .compile
+      .toList
+      .map(_ === List(expected))
+      .assert
   }
 
   test("Requests pipe can process a single POST with a body") {
@@ -79,8 +85,7 @@ class PipesSpec extends munit.CatsEffectSuite {
       "Accept-Encoding: gzip, deflate",
       "Connection: Keep-Alive",
       "",
-      "username=johndoe&password=123456",
-      ""
+      "username=johndoe&password=123456"
     )
     val expected = Request(
       method = "POST",
@@ -95,9 +100,8 @@ class PipesSpec extends munit.CatsEffectSuite {
         "Accept-Encoding" -> "gzip, deflate",
         "Connection" -> "Keep-Alive"
       ),
-      body = "username=johndoe&password=123456\n".getBytes
+      body = "username=johndoe&password=123456".getBytes
     )
-    println(pipes.requests(stream).compile.toList.map(r => new String(r.head.body)).unsafeRunSync())
     pipes.requests(stream).compile.toList.map(_ === List(expected)).assert
   }
 }
