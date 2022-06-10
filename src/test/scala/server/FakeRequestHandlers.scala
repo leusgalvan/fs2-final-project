@@ -5,6 +5,7 @@ trait FakeRequestHandlers {
     Response(
       httpVersion = r.httpVersion,
       status = 200,
-      body = r.body
+      body = r.body,
+      headers = Map("Connection" -> "Closed")
     )
 }

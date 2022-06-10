@@ -10,7 +10,8 @@ object Main extends IOApp.Simple {
       Response(
         httpVersion = r.httpVersion,
         status = 200,
-        body = r.body
+        body = r.body,
+        headers = Map("Content-Length" -> r.body.length.toString)
       )
     val server = Server[IO](maxConnections, host, port, echoRequestHandler)
 
