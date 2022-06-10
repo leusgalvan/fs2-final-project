@@ -6,13 +6,13 @@ object Main extends IOApp.Simple {
     val maxConnections = 1024
     val host = "localhost"
     val port = 29000
-    val handleRequest = (request: Request) =>
+    val echoRequestHandler: Request => Response = (r: Request) =>
       Response(
-        httpVersion = request.httpVersion,
+        httpVersion = r.httpVersion,
         status = 200,
-        body = request.body
+        body = r.body
       )
-    val server = Server[IO](maxConnections, host, port, handleRequest)
+    val server = Server[IO](maxConnections, host, port, echoRequestHandler)
 
     server.stream.compile.drain
   }

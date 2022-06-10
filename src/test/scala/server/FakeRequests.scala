@@ -1,9 +1,13 @@
 package server
 
 import fs2._
+import cats._
+import cats.implicits._
 
 trait FakeRequests {
-  val getWithNoBodyStream: Stream[Pure, String] = Stream(
+  private val crlf = "\r\n".getBytes
+
+  val getWithNoBodyStream: Stream[Pure, Byte] = Stream(
     "GET /api/users HTTP/1.1",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)",
     "Host: www.example.com",
@@ -11,9 +15,9 @@ trait FakeRequests {
     "Accept-Encoding: gzip, deflate",
     "Connection: Keep-Alive",
     ""
-  )
+  ).flatMap(l => Stream.emits(l.getBytes ++ crlf))
 
-  val getWithBodyStream: Stream[Pure, String] = Stream(
+  val getWithBodyStream: Stream[Pure, Byte] = Stream(
     "GET /api/users HTTP/1.1",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)",
     "Host: www.example.com",
@@ -26,9 +30,9 @@ trait FakeRequests {
     "{",
     """  "id": 123""",
     "}"
-  )
+  ).flatMap(l => Stream.emits(l.getBytes ++ crlf))
 
-  val postWithBodyStream: Stream[Pure, String] = Stream(
+  val postWithBodyStream: Stream[Pure, Byte] = Stream(
     "POST /api/users HTTP/1.1",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)",
     "Host: www.example.com",
@@ -39,7 +43,7 @@ trait FakeRequests {
     "Connection: Keep-Alive",
     "",
     "username=johndoe&password=123456"
-  )
+  ).flatMap(l => Stream.emits(l.getBytes ++ crlf))
 
   val getWithNoBodyRequest: Request = Request(
     method = "GET",

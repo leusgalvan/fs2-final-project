@@ -11,9 +11,9 @@ import fs2._
 class ServerSpec extends munit.CatsEffectSuite with FakeRequestHandlers with FakePipes with FakeRequests with FakeTcpServers with FakeTCPChannels {
   test("Server works ok") {
     val fakeTCPChannels: List[ReadWrite[IO]] = List(
-      new ReadWrite[IO](getWithBodyStream.flatMap(s => Stream.emits((s ++ "\r\n").getBytes))),
-      new ReadWrite[IO](getWithNoBodyStream.flatMap(s => Stream.emits((s ++ "\r\n").getBytes))),
-      new ReadWrite[IO](postWithBodyStream.flatMap(s => Stream.emits((s ++ "\r\n").getBytes)))
+      new ReadWrite[IO](getWithBodyStream),
+      new ReadWrite[IO](getWithNoBodyStream),
+      new ReadWrite[IO](postWithBodyStream)
     )
     val server = Server.make[IO](
       maxConnections = 10,
