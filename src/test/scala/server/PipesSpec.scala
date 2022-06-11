@@ -2,6 +2,7 @@ package server
 
 import cats.implicits._
 import cats.effect._
+import fakes.FakeRequests
 import fs2._
 
 class PipesSpec extends munit.CatsEffectSuite with FakeRequests {

@@ -1,7 +1,7 @@
 package tcp
 
 import cats.effect._
-import tcp.FakeSocketChannel.{FakeReadableChannel, FakeWritableChannel}
+import fakes.FakeSocketChannel.{FakeReadableChannel, FakeWritableChannel}
 
 import java.net.{Socket, SocketAddress, SocketOption}
 import java.nio.ByteBuffer

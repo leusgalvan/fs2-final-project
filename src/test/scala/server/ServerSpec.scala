@@ -3,9 +3,9 @@ package server
 import cats.implicits._
 import cats.effect._
 import cats.effect.implicits._
-import tcp.{FakeTCPChannels, FakeTcpServers}
-import scala.concurrent.duration._
+import fakes.{FakePipes, FakeRequestHandlers, FakeRequests, FakeTCPChannels, FakeTcpServers}
 
+import scala.concurrent.duration._
 import fs2._
 
 class ServerSpec extends munit.CatsEffectSuite with FakeRequestHandlers with FakePipes with FakeRequests with FakeTcpServers with FakeTCPChannels {

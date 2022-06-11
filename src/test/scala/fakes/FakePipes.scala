@@ -1,6 +1,7 @@
-package server
+package fakes
 
-import fs2._
+import fs2.Stream
+import server.{Pipes, Request}
 
 trait FakePipes {
   def oneRequest[F[_]](r: Request): Pipes[F] = multipleRequests(List(r))

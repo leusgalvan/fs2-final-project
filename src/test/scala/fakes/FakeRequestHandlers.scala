@@ -1,4 +1,6 @@
-package server
+package fakes
+
+import server._
 
 trait FakeRequestHandlers {
   val echoRequestHandler: Request => Response = (r: Request) =>

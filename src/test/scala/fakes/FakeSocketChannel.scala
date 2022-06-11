@@ -1,15 +1,15 @@
-package tcp
+package fakes
 
-import java.net.{Socket, SocketAddress, SocketOption}
-import java.nio.ByteBuffer
-import java.nio.channels.SocketChannel
-import java.util
+import java.nio._
+import java.nio.channels._
+import java.net._
 
 object FakeSocketChannel {
   class DummyChannel extends SocketChannel(null) {
     override def bind(local: SocketAddress): SocketChannel = ???
 
-    override def setOption[T](name: SocketOption[T], value: T): SocketChannel = ???
+    override def setOption[T](name: SocketOption[T], value: T): SocketChannel =
+      ???
 
     override def shutdownInput(): SocketChannel = ???
 
@@ -29,11 +29,16 @@ object FakeSocketChannel {
 
     override def read(dst: ByteBuffer): Int = ???
 
-    override def read(dsts: Array[ByteBuffer], offset: Int, length: Int): Long = ???
+    override def read(dsts: Array[ByteBuffer], offset: Int, length: Int): Long =
+      ???
 
     override def write(src: ByteBuffer): Int = ???
 
-    override def write(srcs: Array[ByteBuffer], offset: Int, length: Int): Long = ???
+    override def write(
+        srcs: Array[ByteBuffer],
+        offset: Int,
+        length: Int
+    ): Long = ???
 
     override def getLocalAddress: SocketAddress = ???
 
@@ -43,7 +48,7 @@ object FakeSocketChannel {
 
     override def getOption[T](name: SocketOption[T]): T = ???
 
-    override def supportedOptions(): util.Set[SocketOption[_]] = ???
+    override def supportedOptions(): java.util.Set[SocketOption[_]] = ???
   }
 
   class FakeReadableChannel(bytesToRead: Array[Byte]) extends DummyChannel {

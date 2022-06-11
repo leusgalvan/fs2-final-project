@@ -1,10 +1,12 @@
-package tcp
+package fakes
 
+import tcp._
 import cats.effect._
 import fs2._
 
 trait FakeTCPChannels {
-  class ReadWrite[F[_]: Sync](readBytes: Stream[F, Byte]) extends TCPChannel[F] {
+  class ReadWrite[F[_]: Sync](readBytes: Stream[F, Byte])
+      extends TCPChannel[F] {
     var bytes: Array[Byte] = Array.empty
 
     override def stream: Stream[F, Byte] = readBytes

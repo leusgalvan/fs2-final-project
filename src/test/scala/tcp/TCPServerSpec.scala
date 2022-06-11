@@ -1,7 +1,8 @@
 package tcp
 
 import cats.effect._
-import tcp.FakeSocketChannel.{DummyChannel, FakeReadableChannel}
+import fakes.FakeServerSocketChannel
+import fakes.FakeSocketChannel.{DummyChannel, FakeReadableChannel}
 
 import java.nio.channels.SocketChannel
 import scala.concurrent.duration._

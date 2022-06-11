@@ -1,12 +1,9 @@
-package server
+package fakes
 
 import fs2._
-import cats._
-import cats.implicits._
+import server._
 
 trait FakeRequests {
-  private val crlf = "\r\n".getBytes
-
   val getWithNoBodyStream: Stream[Pure, Byte] = Stream(
     "GET /api/users HTTP/1.1\n",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n",
