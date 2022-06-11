@@ -13,3 +13,4 @@ addCompilerPlugin(
 libraryDependencies += "co.fs2" %% "fs2-core" % "3.2.7"
 libraryDependencies += "co.fs2" %% "fs2-io" % "3.2.7"
 libraryDependencies += "org.typelevel" %% "munit-cats-effect-3" % "1.0.7" % "test"
+libraryDependencies += "org.scalameta" %% "munit-scalacheck" % "0.7.29" % Test

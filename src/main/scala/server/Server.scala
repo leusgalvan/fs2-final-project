@@ -45,9 +45,7 @@ object Server {
     new Server[F] {
       def connectionStream(socket: TCPChannel[F]): Stream[F, Nothing] = {
         socket.stream
-          //.evalTap(req => console.println(req.show))(sync)
           .through(pipes.requests)
-          //.evalTap(req => console.println(req.show))(sync)
           .map(handleRequest)
           .evalMap(r => socket.write(r.bytes))
           .drain

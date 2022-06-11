@@ -35,6 +35,7 @@ object TCPChannel {
           Sync[F].blocking {
             val byteBuffer: ByteBuffer = ByteBuffer.allocate(chunk.length)
             byteBuffer.put(chunk)
+            byteBuffer.flip()
             socketChannel.write(byteBuffer)
           }
         }

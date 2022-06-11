@@ -5,7 +5,7 @@ import server._
 
 trait FakeRequests {
   val getWithNoBodyStream: Stream[Pure, Byte] = Stream(
-    "GET /api/users HTTP/1.1\n",
+    "GET /api/users HTTP/1.1\r\n",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n",
     "Host: www.example.com\r\n",
     "Accept-Language: en-us\r\n",
@@ -15,7 +15,7 @@ trait FakeRequests {
   ).flatMap(l => Stream.emits(l.getBytes))
 
   val getWithBodyStream: Stream[Pure, Byte] = Stream(
-    "GET /api/users HTTP/1.1\n",
+    "GET /api/users HTTP/1.1\r\n",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n",
     "Host: www.example.com\r\n",
     "Content-Type: application/json\r\n",
@@ -30,7 +30,7 @@ trait FakeRequests {
   ).flatMap(l => Stream.emits(l.getBytes))
 
   val postWithBodyStream: Stream[Pure, Byte] = Stream(
-    "POST /api/users HTTP/1.1\n",
+    "POST /api/users HTTP/1.1\r\n",
     "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n",
     "Host: www.example.com\r\n",
     "Content-Type: application/x-www-form-urlencoded\r\n",
