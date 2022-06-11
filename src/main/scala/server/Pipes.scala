@@ -1,8 +1,7 @@
 package server
 
-import fs2._
 import cats.implicits._
-import cats.effect._
+import fs2._
 
 trait Pipes[F[_]] {
   def requests(s: Stream[F, Byte]): Stream[F, Request]
@@ -10,6 +9,16 @@ trait Pipes[F[_]] {
 
 object Pipes {
   def impl[F[_]: RaiseThrowable]: Pipes[F] = new Pipes[F] {
+    private val SPACE = ' '.toByte
+    private val CR = '\r'.toByte
+    private val LF = '\n'.toByte
+
+    private def dropLastCR(chunk: Chunk[Byte]): Chunk[Byte] = {
+      if(chunk.last.exists(_ === CR)) {
+        chunk.dropRight(1)
+      } else chunk
+    }
+
     def requests(s: Stream[F, Byte]): Stream[F, Request] = {
       def go(
           s: Stream[F, Byte],
@@ -21,7 +30,7 @@ object Pipes {
           case Some((chunk, restOfStream)) =>
             step match {
               case 0 => // reading method
-                chunk.indexWhere(_ === ' '.toByte) match {
+                chunk.indexWhere(_ === SPACE) match {
                   case Some(idx) =>
                     val method = new String(buffer ++ chunk.take(idx).toArray)
                     val newReq = request.copy(method = method)
@@ -30,7 +39,7 @@ object Pipes {
                     go(restOfStream, step, request, buffer ++ chunk.toArray)
                 }
               case 1 => // reading url
-                chunk.indexWhere(_ === ' '.toByte) match {
+                chunk.indexWhere(_ === SPACE) match {
                   case Some(idx) =>
                     val url = new String(buffer ++ chunk.take(idx).toArray)
                     val newReq = request.copy(url = url)
@@ -39,19 +48,16 @@ object Pipes {
                     go(restOfStream, step, request, buffer ++ chunk.toArray)
                 }
               case 2 => // reading httpVersion
-                chunk.indexWhere(_ === '\n'.toByte) match {
+                chunk.indexWhere(_ === LF) match {
                   case Some(idx) =>
                     val httpVersion = new String(buffer ++ chunk.take(idx - 1).toArray)
                     val newReq = request.copy(httpVersion = httpVersion)
                     go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, newReq, Array.empty)
                   case None =>
-                    val c = if(chunk.last.exists(_ === '\r')) {
-                      chunk.dropRight(1)
-                    } else chunk
-                    go(restOfStream, step, request, buffer ++ c.toArray)
+                    go(restOfStream, step, request, buffer ++ dropLastCR(chunk).toArray)
                 }
               case 3 => // reading header
-                chunk.indexWhere(_ === '\n'.toByte) match {
+                chunk.indexWhere(_ === LF) match {
                   case Some(idx) if idx > 1 || buffer.nonEmpty =>
                     val headerStr = new String(buffer ++ chunk.take(idx - 1).toArray)
                     val elems = headerStr.split(": ")
@@ -60,10 +66,7 @@ object Pipes {
                   case Some(idx) if buffer.isEmpty =>
                     go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, request, Array.empty)
                   case None =>
-                    val c = if(chunk.last.exists(_ === '\r')) {
-                      chunk.dropRight(1)
-                    } else chunk
-                    go(restOfStream, step, request, buffer ++ c.toArray)
+                    go(restOfStream, step, request, buffer ++ dropLastCR(chunk).toArray)
                 }
               case 4 => // Reading body
                 val bodyLength = request.contentLength - buffer.length
