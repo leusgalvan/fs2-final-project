@@ -52,25 +52,13 @@ object Pipes {
                 }
               case 3 => // reading header
                 chunk.indexWhere(_ === '\n'.toByte) match {
-                  case Some(idx) if idx > 1 =>
+                  case Some(idx) if idx > 1 || buffer.nonEmpty =>
                     val headerStr = new String(buffer ++ chunk.take(idx - 1).toArray)
                     val elems = headerStr.split(": ")
                     val newReq = request.copy(headers = request.headers + (elems(0) -> elems(1)))
                     go(restOfStream.cons(chunk.drop(idx + 1)), step, newReq, Array.empty)
-                  case Some(idx) if idx == 1 && buffer.nonEmpty =>
-                    val headerStr = new String(buffer)
-                    val elems = headerStr.split(": ")
-                    val newReq = request.copy(headers = request.headers + (elems(0) -> elems(1)))
-                    go(restOfStream.cons(chunk.drop(idx + 1)), step, newReq, Array.empty)
-                  case Some(idx) if idx == 1 && buffer.isEmpty =>
+                  case Some(idx) if buffer.isEmpty =>
                     go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, request, Array.empty)
-                  case Some(idx) if idx == 0 && buffer.isEmpty =>
-                    go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, request, Array.empty)
-                  case Some(idx) if idx == 0 && buffer.nonEmpty =>
-                    val headerStr = new String(buffer)
-                    val elems = headerStr.split(": ")
-                    val newReq = request.copy(headers = request.headers + (elems(0) -> elems(1)))
-                    go(restOfStream.cons(chunk.drop(idx + 1)), step, newReq, Array.empty)
                   case None =>
                     val c = if(chunk.last.exists(_ === '\r')) {
                       chunk.dropRight(1)
