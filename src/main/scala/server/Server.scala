@@ -15,38 +15,35 @@ trait Server[F[_]] {
 }
 
 object Server {
-  def apply[F[_]: RaiseThrowable](
+  def apply[F[_]](
       maxConnections: Int,
       host: String,
       port: Int,
       handleRequest: Request => Response
   )(implicit
-      logger: Logger[F],
       console: Console[F],
+      sync: Sync[F],
       concurrent: Concurrent[F],
-      sync: Sync[F]
+      raiseThrowable: RaiseThrowable[F]
   ): Server[F] = {
     val tcpServer = TCPServer.impl[F](host, port)
-    val pipes = Pipes.impl[F]
+    val pipes = Pipes.impl[F](console, sync, raiseThrowable)
     make(maxConnections, handleRequest, pipes, tcpServer)
   }
 
-  def make[F[_]: RaiseThrowable](
+  def make[F[_]: Console: Concurrent](
       maxConnections: Int,
       handleRequest: Request => Response,
       pipes: Pipes[F],
       tcpServer: TCPServer[F]
-  )(implicit
-      logger: Logger[F],
-      console: Console[F],
-      concurrent: Concurrent[F],
-      sync: Sync[F]
   ): Server[F] =
     new Server[F] {
       def connectionStream(socket: TCPChannel[F]): Stream[F, Nothing] = {
         socket.stream
           .through(pipes.requests)
+          .through(pipes.log("[*] New request"))
           .map(handleRequest)
+          .through(pipes.log("[*] New response"))
           .evalMap(r => socket.write(r.bytes))
           .drain
       }
