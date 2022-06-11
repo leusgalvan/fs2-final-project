@@ -13,6 +13,10 @@ class PipesSpec extends ScalaCheckSuite with FakeRequests {
   implicit val ioRuntime: IORuntime = IORuntime.global
   private val pipes = Pipes.impl[IO]
 
+  def assertEqualsS(s1: String, s2: String)(implicit loc: munit.Location): Unit = {
+    assertEquals(s1.getBytes.toList, s2.getBytes.toList)
+  }
+
   def check(
       requestBytes: Stream[Pure, Byte],
       expectedRequest: Request,
@@ -23,23 +27,17 @@ class PipesSpec extends ScalaCheckSuite with FakeRequests {
     assertEquals(result.length, 1)
 
     val r = result.head
-    assertEquals(
-      r.method.getBytes.toList,
-      expectedRequest.method.getBytes.toList
-    )
-    assertEquals(r.url.getBytes.toList, expectedRequest.url.getBytes.toList)
-    assertEquals(
-      r.httpVersion.getBytes.toList,
-      expectedRequest.httpVersion.getBytes.toList
-    )
+    assertEqualsS(r.method, expectedRequest.method)
+    assertEqualsS(r.url, expectedRequest.url)
+    assertEqualsS(r.httpVersion, expectedRequest.httpVersion)
     assertEquals(r.headers.size, expectedRequest.headers.size)
 
     r.headers.toList
       .sortBy(_._1)
       .lazyZip(expectedRequest.headers.toList.sortBy(_._1))
       .foreach { case ((k1, v1), (k2, v2)) =>
-        assertEquals(k1.getBytes.toList, k2.getBytes.toList)
-        assertEquals(v1.getBytes.toList, v2.getBytes.toList)
+        assertEqualsS(k1, k2)
+        assertEqualsS(v1, v2)
       }
 
     assertEquals(r.body.toList, expectedRequest.body.toList)
