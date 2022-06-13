@@ -15,7 +15,7 @@ class ResponseSpec extends munit.FunSuite {
     )
     val encoded = new String(response.bytes)
     val expected =
-      "HTTP/1.1 200 OK\n" +
+      "HTTP/1.1 200 OK\r\n" +
       "Content-Type: application/json\r\n" ++
       "Content-Length: 10\r\n" ++
       "\r\n" ++

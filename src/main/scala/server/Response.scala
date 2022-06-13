@@ -9,7 +9,7 @@ case class Response(
     headers: Map[String, String]
 ) {
   def bytes: Array[Byte] =
-    s"$httpVersion ${status.code} ${status.reason}".getBytes ++ "\n".getBytes ++
+    s"$httpVersion ${status.code} ${status.reason}\r\n".getBytes ++
       headers.map { case (k, v) => s"$k: $v\r\n" }.mkString.getBytes ++
       "\r\n".getBytes ++
       body
