@@ -19,7 +19,7 @@ object Server {
       maxConnections: Int,
       host: String,
       port: Int,
-      handleRequest: Request => Response
+      handleRequest: Request => F[Response]
   )(implicit
       console: Console[F],
       sync: Sync[F],
@@ -33,7 +33,7 @@ object Server {
 
   def make[F[_]: Console: Concurrent](
       maxConnections: Int,
-      handleRequest: Request => Response,
+      handleRequest: Request => F[Response],
       pipes: Pipes[F],
       tcpServer: TCPServer[F]
   ): Server[F] =
@@ -42,7 +42,7 @@ object Server {
         socket.stream
           .through(pipes.requests)
           .through(pipes.log("[*] New request"))
-          .map(handleRequest)
+          .evalMap(handleRequest)
           .through(pipes.log("[*] New response"))
           .evalMap(r => socket.write(r.bytes))
           .handleErrorWith(err => Stream.exec(Console[F].errorln(err.getMessage)))

@@ -28,7 +28,7 @@ class ServerSpec
       getWithNoBodyRequest,
       postWithBodyRequest
     )
-    val fakeRequestHandler = failOnPostRequestHandler
+    val fakeRequestHandler = failOnPostRequestHandler[IO]
     val fakePipes: Pipes[IO] = multipleRequests(fakeRequests)
     val server = Server.make[IO](
       maxConnections = 10,
@@ -46,7 +46,7 @@ class ServerSpec
     fakeTCPChannels.zipWithIndex.foreach { case (tcpChannel, i) =>
       assertEquals(
         tcpChannel.bytes.toList,
-        Try(fakeRequestHandler(fakeRequests(i)).bytes.toList).getOrElse(Nil)
+        Try(fakeRequestHandler(fakeRequests(i)).unsafeRunSync().bytes.toList).getOrElse(Nil)
       )
     }
   }
