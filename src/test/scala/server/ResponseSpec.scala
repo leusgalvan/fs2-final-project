@@ -1,10 +1,12 @@
 package server
 
+import server.Response.Ok
+
 class ResponseSpec extends munit.FunSuite {
   test("Response is correctly encoded to bytes") {
     val response = Response(
       httpVersion = "HTTP/1.1",
-      status = 200,
+      status = Ok,
       body = "{\"id\":123}".getBytes,
       headers = Map(
         "Content-Type" -> "application/json",
