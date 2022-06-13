@@ -13,7 +13,18 @@ class PipesSpec extends ScalaCheckSuite with FakeRequests {
   implicit val ioRuntime: IORuntime = IORuntime.global
   private val pipes = Pipes.impl[IO]
 
-  def assertEqualsS(s1: String, s2: String)(implicit loc: munit.Location): Unit = {
+  private def assertHeadersEquals(r: Request, expectedRequest: Request)(implicit loc: munit.Location): Unit = {
+    assertEquals(r.headers.size, expectedRequest.headers.size)
+    r.headers.toList
+      .sortBy(_._1)
+      .lazyZip(expectedRequest.headers.toList.sortBy(_._1))
+      .foreach { case ((k1, v1), (k2, v2)) =>
+        assertStringEquals(k1, k2)
+        assertStringEquals(v1, v2)
+      }
+  }
+
+  private def assertStringEquals(s1: String, s2: String)(implicit loc: munit.Location): Unit = {
     assertEquals(s1.getBytes.toList, s2.getBytes.toList)
   }
 
@@ -23,23 +34,15 @@ class PipesSpec extends ScalaCheckSuite with FakeRequests {
       chunkSize: Int
   )(implicit loc: munit.Location): Unit = {
     val chunkedBytes = requestBytes.chunkN(chunkSize).flatMap(Stream.chunk)
+
     val result = pipes.requests(chunkedBytes).compile.toList.unsafeRunSync()
     assertEquals(result.length, 1)
 
     val r = result.head
-    assertEqualsS(r.method, expectedRequest.method)
-    assertEqualsS(r.url, expectedRequest.url)
-    assertEqualsS(r.httpVersion, expectedRequest.httpVersion)
-    assertEquals(r.headers.size, expectedRequest.headers.size)
-
-    r.headers.toList
-      .sortBy(_._1)
-      .lazyZip(expectedRequest.headers.toList.sortBy(_._1))
-      .foreach { case ((k1, v1), (k2, v2)) =>
-        assertEqualsS(k1, k2)
-        assertEqualsS(v1, v2)
-      }
-
+    assertStringEquals(r.method, expectedRequest.method)
+    assertStringEquals(r.url, expectedRequest.url)
+    assertStringEquals(r.httpVersion, expectedRequest.httpVersion)
+    assertHeadersEquals(r, expectedRequest)
     assertEquals(r.body.toList, expectedRequest.body.toList)
   }
 
