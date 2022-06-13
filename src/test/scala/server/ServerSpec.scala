@@ -42,9 +42,9 @@ class ServerSpec
       .unsafeRunSync()
 
     fakeTCPChannels.zipWithIndex.foreach { case (tcpChannel, i) =>
-      assertNotEquals(
-        tcpChannel.bytes,
-        fakeRequestHandler(fakeRequests(i)).bytes
+      assertEquals(
+        tcpChannel.bytes.toList,
+        fakeRequestHandler(fakeRequests(i)).bytes.toList
       )
     }
   }
