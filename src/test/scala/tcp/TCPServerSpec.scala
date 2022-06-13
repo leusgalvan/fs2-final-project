@@ -15,7 +15,7 @@ class TCPServerSpec extends munit.CatsEffectSuite with FakeSocketChannel with Fa
     val tcpServer = TCPServer.unsafeCreate[IO](serverSocketChannel)
     tcpServer
       .stream
-      .interruptAfter(100.millis)
+      .take(socketChannels.length)
       .compile
       .toList
       .map(_.length)

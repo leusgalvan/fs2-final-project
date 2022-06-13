@@ -9,7 +9,6 @@ trait FakeServerSocketChannel {
       socketChannels: List[SocketChannel]
   ): ServerSocketChannel = new DummyServerSocketChannel {
     var channels: List[SocketChannel] = socketChannels
-    val blockPeriodAfterLast: Long = 150.millis.toMillis
 
     override def accept(): SocketChannel = {
       channels match {
@@ -17,7 +16,6 @@ trait FakeServerSocketChannel {
           channels = tail
           head
         case Nil =>
-          Thread.sleep(blockPeriodAfterLast)
           throw new Exception("No more channels to accept")
       }
     }

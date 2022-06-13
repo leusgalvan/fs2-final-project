@@ -36,7 +36,7 @@ class ServerSpec
     )
 
     server.stream
-      .take(3)
+      .take(fakeTCPChannels.length)
       .compile
       .drain
       .unsafeRunSync()
