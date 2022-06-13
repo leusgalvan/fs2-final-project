@@ -4,10 +4,10 @@ import java.net._
 import java.nio.channels._
 import scala.concurrent.duration._
 
-object FakeServerSocketChannel {
+trait FakeServerSocketChannel {
   def fromSocketChannels(
       socketChannels: List[SocketChannel]
-  ): ServerSocketChannel = new DummyChannel {
+  ): ServerSocketChannel = new DummyServerSocketChannel {
     var channels: List[SocketChannel] = socketChannels
     val blockPeriodAfterLast: Long = 150.millis.toMillis
 
@@ -23,7 +23,7 @@ object FakeServerSocketChannel {
     }
   }
 
-  class DummyChannel extends ServerSocketChannel(null) {
+  class DummyServerSocketChannel extends ServerSocketChannel(null) {
     override def bind(local: SocketAddress, backlog: Int): ServerSocketChannel =
       ???
 

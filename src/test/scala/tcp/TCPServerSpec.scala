@@ -1,18 +1,17 @@
 package tcp
 
 import cats.effect._
-import fakes.FakeServerSocketChannel
-import fakes.FakeSocketChannel.{DummyChannel, FakeReadableChannel}
+import fakes.{FakeServerSocketChannel, FakeSocketChannel}
 
 import java.nio.channels.SocketChannel
 import scala.concurrent.duration._
 
-class TCPServerSpec extends munit.CatsEffectSuite {
+class TCPServerSpec extends munit.CatsEffectSuite with FakeSocketChannel with FakeServerSocketChannel {
   test("TCPServer emits accepted connections") {
     val socketChannels: List[SocketChannel] = List(
-      new DummyChannel, new DummyChannel, new DummyChannel
+      new DummySocketChannel, new DummySocketChannel, new DummySocketChannel
     )
-    val serverSocketChannel = FakeServerSocketChannel.fromSocketChannels(socketChannels)
+    val serverSocketChannel = fromSocketChannels(socketChannels)
     val tcpServer = TCPServer.unsafeCreate[IO](serverSocketChannel)
     tcpServer
       .stream

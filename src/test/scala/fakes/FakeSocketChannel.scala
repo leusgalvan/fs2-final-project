@@ -4,8 +4,8 @@ import java.nio._
 import java.nio.channels._
 import java.net._
 
-object FakeSocketChannel {
-  class DummyChannel extends SocketChannel(null) {
+trait FakeSocketChannel {
+  class DummySocketChannel extends SocketChannel(null) {
     override def bind(local: SocketAddress): SocketChannel = ???
 
     override def setOption[T](name: SocketOption[T], value: T): SocketChannel =
@@ -51,7 +51,7 @@ object FakeSocketChannel {
     override def supportedOptions(): java.util.Set[SocketOption[_]] = ???
   }
 
-  class FakeReadableChannel(bytesToRead: Array[Byte]) extends DummyChannel {
+  class FakeReadableSocketChannel(bytesToRead: Array[Byte]) extends DummySocketChannel {
     var lastIndex = 0
 
     override def read(dst: ByteBuffer): Int = {
@@ -62,7 +62,7 @@ object FakeSocketChannel {
     }
   }
 
-  class FakeWritableChannel() extends DummyChannel {
+  class FakeWritableSocketChannel() extends DummySocketChannel {
     var bytes: Array[Byte] = Array.empty
     override def write(src: ByteBuffer): Int = {
       val bs = src.array()
