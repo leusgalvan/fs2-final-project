@@ -4,6 +4,8 @@ import cats.effect._
 import cats.effect.unsafe.IORuntime
 import fakes._
 
+import scala.util.Try
+
 class ServerSpec
     extends munit.FunSuite
     with FakeRequestHandlers
@@ -13,7 +15,7 @@ class ServerSpec
     with FakeTCPChannels {
   implicit val ioRuntime: IORuntime = IORuntime.global
   test(
-    "Server writes response bytes to corresponding tcp connection channels"
+    "Server writes successful response bytes to corresponding tcp connection channels"
   ) {
     val fakeTCPChannels: List[ReadWrite[IO]] = List(
       new ReadWrite[IO](getWithBodyStream),
@@ -26,7 +28,7 @@ class ServerSpec
       getWithNoBodyRequest,
       postWithBodyRequest
     )
-    val fakeRequestHandler = echoRequestHandler
+    val fakeRequestHandler = failOnPostRequestHandler
     val fakePipes: Pipes[IO] = multipleRequests(fakeRequests)
     val server = Server.make[IO](
       maxConnections = 10,
@@ -44,7 +46,7 @@ class ServerSpec
     fakeTCPChannels.zipWithIndex.foreach { case (tcpChannel, i) =>
       assertEquals(
         tcpChannel.bytes.toList,
-        fakeRequestHandler(fakeRequests(i)).bytes.toList
+        Try(fakeRequestHandler(fakeRequests(i)).bytes.toList).getOrElse(Nil)
       )
     }
   }

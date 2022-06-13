@@ -45,6 +45,7 @@ object Server {
           .map(handleRequest)
           .through(pipes.log("[*] New response"))
           .evalMap(r => socket.write(r.bytes))
+          .handleErrorWith(err => Stream.exec(Console[F].errorln(err.getMessage)))
           .drain
       }
 

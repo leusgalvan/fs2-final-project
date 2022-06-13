@@ -11,4 +11,13 @@ trait FakeRequestHandlers {
       body = r.body,
       headers = Map("Connection" -> "Closed")
     )
+  val failOnPostRequestHandler: Request => Response = (r: Request) =>
+    if (r.method == "POST") throw new Exception("Failed handling request")
+    else
+      Response(
+        httpVersion = r.httpVersion,
+        status = Ok,
+        body = r.body,
+        headers = Map("Connection" -> "Closed")
+      )
 }
