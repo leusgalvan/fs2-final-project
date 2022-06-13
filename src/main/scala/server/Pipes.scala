@@ -26,9 +26,10 @@ object Pipes {
       val validMethods = Set("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS")
 
       def dropLastCR(chunk: Chunk[Byte]): Chunk[Byte] = {
-        if (chunk.last.exists(_ === CR)) {
+        if (chunk.last.exists(_ === CR))
           chunk.dropRight(1)
-        } else chunk
+        else
+          chunk
       }
 
       def go(
@@ -48,12 +49,7 @@ object Pipes {
                     if (!validMethods.contains(method))
                       Pull.raiseError(new Exception(s"Invalid method: $method"))
                     else
-                      go(
-                        restOfStream.cons(chunk.drop(idx + 1)),
-                        step + 1,
-                        newReq,
-                        Array.empty
-                      )
+                      go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, newReq, Array.empty)
                   case None =>
                     go(restOfStream, step, request, buffer ++ chunk.toArray)
                 }
@@ -62,34 +58,18 @@ object Pipes {
                   case Some(idx) =>
                     val url = new String(buffer ++ chunk.take(idx).toArray)
                     val newReq = request.copy(url = url)
-                    go(
-                      restOfStream.cons(chunk.drop(idx + 1)),
-                      step + 1,
-                      newReq,
-                      Array.empty
-                    )
+                    go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, newReq, Array.empty)
                   case None =>
                     go(restOfStream, step, request, buffer ++ chunk.toArray)
                 }
               case 2 => // reading httpVersion
                 chunk.indexWhere(_ === LF) match {
                   case Some(idx) =>
-                    val httpVersion =
-                      new String(buffer ++ chunk.take(idx - 1).toArray)
+                    val httpVersion = new String(buffer ++ chunk.take(idx - 1).toArray)
                     val newReq = request.copy(httpVersion = httpVersion)
-                    go(
-                      restOfStream.cons(chunk.drop(idx + 1)),
-                      step + 1,
-                      newReq,
-                      Array.empty
-                    )
+                    go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, newReq, Array.empty)
                   case None =>
-                    go(
-                      restOfStream,
-                      step,
-                      request,
-                      buffer ++ dropLastCR(chunk).toArray
-                    )
+                    go(restOfStream, step, request, buffer ++ dropLastCR(chunk).toArray)
                 }
               case 3 => // reading header
                 chunk.indexWhere(_ === LF) match {
@@ -97,29 +77,12 @@ object Pipes {
                     val headerStr =
                       new String(buffer ++ chunk.take(idx - 1).toArray)
                     val elems = headerStr.split(": ")
-                    val newReq = request.copy(headers =
-                      request.headers + (elems(0) -> elems(1))
-                    )
-                    go(
-                      restOfStream.cons(chunk.drop(idx + 1)),
-                      step,
-                      newReq,
-                      Array.empty
-                    )
+                    val newReq = request.copy(headers = request.headers + (elems(0) -> elems(1)))
+                    go(restOfStream.cons(chunk.drop(idx + 1)), step, newReq, Array.empty)
                   case Some(idx) if buffer.isEmpty =>
-                    go(
-                      restOfStream.cons(chunk.drop(idx + 1)),
-                      step + 1,
-                      request,
-                      Array.empty
-                    )
+                    go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, request, Array.empty)
                   case None =>
-                    go(
-                      restOfStream,
-                      step,
-                      request,
-                      buffer ++ dropLastCR(chunk).toArray
-                    )
+                    go(restOfStream, step, request, buffer ++ dropLastCR(chunk).toArray)
                 }
               case 4 => // Reading body
                 val bodyLength = request.contentLength - buffer.length

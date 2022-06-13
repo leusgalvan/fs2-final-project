@@ -8,11 +8,11 @@ class TCPChannelSpec extends munit.FunSuite with FakeSocketChannel {
   implicit val ioRuntime: IORuntime = IORuntime.global
 
   test("TCPChannel streams values from a socket") {
-    val bytesRead = Array[Byte](1, 2, 3)
-    val fakeChannel = new FakeReadableSocketChannel(bytesRead)
+    val bytesToRead = Array[Byte](1, 2, 3)
+    val fakeChannel = new FakeReadableSocketChannel(bytesToRead)
     val tcpChannel = TCPChannel.fromSocketChannel[IO](fakeChannel, bufferSize = 2)
-    val result = tcpChannel.stream.take(bytesRead.length).compile.toList.unsafeRunSync()
-    assertEquals(result, bytesRead.toList)
+    val result = tcpChannel.stream.take(bytesToRead.length).compile.toList.unsafeRunSync()
+    assertEquals(result, bytesToRead.toList)
   }
 
   test("TCPChannel writes values to a socket") {
