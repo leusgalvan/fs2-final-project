@@ -42,6 +42,16 @@ trait FakeRequests {
     "username=johndoe&password=123456"
   ).flatMap(l => Stream.emits(l.getBytes))
 
+  val invalidMethodStream: Stream[Pure, Byte] = Stream(
+    "REMOVE /api/users HTTP/1.1\r\n",
+    "User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n",
+    "Host: www.example.com\r\n",
+    "Accept-Language: en-us\r\n",
+    "Accept-Encoding: gzip, deflate\r\n",
+    "Connection: Keep-Alive\r\n",
+    "\r\n"
+  ).flatMap(l => Stream.emits(l.getBytes))
+
   val getWithNoBodyRequest: Request = Request(
     method = "GET",
     url = "/api/users",

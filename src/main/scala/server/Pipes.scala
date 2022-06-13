@@ -23,6 +23,7 @@ object Pipes {
       val SPACE = ' '.toByte
       val CR = '\r'.toByte
       val LF = '\n'.toByte
+      val validMethods = Set("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS")
 
       def dropLastCR(chunk: Chunk[Byte]): Chunk[Byte] = {
         if (chunk.last.exists(_ === CR)) {
@@ -44,12 +45,15 @@ object Pipes {
                   case Some(idx) =>
                     val method = new String(buffer ++ chunk.take(idx).toArray)
                     val newReq = request.copy(method = method)
-                    go(
-                      restOfStream.cons(chunk.drop(idx + 1)),
-                      step + 1,
-                      newReq,
-                      Array.empty
-                    )
+                    if (!validMethods.contains(method))
+                      Pull.raiseError(new Exception(s"Invalid method: $method"))
+                    else
+                      go(
+                        restOfStream.cons(chunk.drop(idx + 1)),
+                        step + 1,
+                        newReq,
+                        Array.empty
+                      )
                   case None =>
                     go(restOfStream, step, request, buffer ++ chunk.toArray)
                 }

@@ -9,9 +9,15 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop._
 import org.scalacheck._
 
+import scala.util.Try
+
 class PipesSpec extends ScalaCheckSuite with FakeRequests {
   implicit val ioRuntime: IORuntime = IORuntime.global
   private val pipes = Pipes.impl[IO]
+
+  private def rechunk(bytes: Stream[Pure, Byte], chunkSize: Int): Stream[Pure, Byte] = {
+    bytes.chunkN(chunkSize).flatMap(Stream.chunk)
+  }
 
   private def assertHeadersEquals(r: Request, expectedRequest: Request)(implicit loc: munit.Location): Unit = {
     assertEquals(r.headers.size, expectedRequest.headers.size)
@@ -33,7 +39,7 @@ class PipesSpec extends ScalaCheckSuite with FakeRequests {
       expectedRequest: Request,
       chunkSize: Int
   )(implicit loc: munit.Location): Unit = {
-    val chunkedBytes = requestBytes.chunkN(chunkSize).flatMap(Stream.chunk)
+    val chunkedBytes = rechunk(requestBytes, chunkSize)
 
     val result = pipes.requests(chunkedBytes).compile.toList.unsafeRunSync()
     assertEquals(result.length, 1)
@@ -63,6 +69,20 @@ class PipesSpec extends ScalaCheckSuite with FakeRequests {
   property("Requests pipe can process a single POST with a body") {
     forAllNoShrink(chunkSizeGen) { (chunkSize: Int) =>
       check(postWithBodyStream, postWithBodyRequest, chunkSize)
+    }
+  }
+
+  property("Requests pipe fails if provided method is not valid") {
+    forAllNoShrink(chunkSizeGen) { (chunkSize: Int) =>
+      assert(
+        Try {
+          rechunk(invalidMethodStream, chunkSize)
+            .through(pipes.requests)
+            .compile
+            .toList
+            .unsafeRunSync()
+        }.isFailure
+      )
     }
   }
 }
