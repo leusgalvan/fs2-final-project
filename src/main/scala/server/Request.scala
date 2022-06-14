@@ -38,12 +38,4 @@ object Request {
        |  body = ${new String(req.body)}
        |)""".stripMargin
   }
-
-  implicit val deepEq: Eq[Request] = Eq.instance { (r1, r2) =>
-    r1.method === r2.method &&
-    r1.url === r2.url &&
-    r1.httpVersion === r2.httpVersion &&
-    r1.headers === r2.headers
-    r1.body.toList === r2.body.toList
-  }
 }
