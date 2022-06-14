@@ -1,4 +1,4 @@
-package tcp
+package finalproject.tcp
 
 import fs2._
 import cats.effect._
@@ -8,8 +8,6 @@ import java.nio.channels.SocketChannel
 
 /**
  * A channel to write and read from a single connection.
- *
- * @tparam F
  */
 trait TCPChannel[F[_]] {
   /**

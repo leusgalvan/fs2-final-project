@@ -1,7 +1,7 @@
-package fakes
+package finalproject.fakes
 
 import fs2._
-import server._
+import finalproject.server._
 
 trait FakeRequests {
   val getWithNoBodyStream: Stream[Pure, Byte] = Stream(

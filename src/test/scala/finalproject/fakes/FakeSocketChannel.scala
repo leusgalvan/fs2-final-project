@@ -1,4 +1,4 @@
-package fakes
+package finalproject.fakes
 
 import java.nio._
 import java.nio.channels._

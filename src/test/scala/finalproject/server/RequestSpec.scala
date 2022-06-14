@@ -1,4 +1,4 @@
-package server
+package finalproject.server
 
 class RequestSpec extends munit.FunSuite {
   test("Request should calculate correct content length when it has the header") {

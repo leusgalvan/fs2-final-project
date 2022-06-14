@@ -1,8 +1,8 @@
-package server
+package finalproject.server
 
 import cats.effect._
 import cats.effect.unsafe.IORuntime
-import fakes._
+import finalproject.fakes.{FakePipes, FakeRequestHandlers, FakeRequests, FakeTCPChannels, FakeTcpServers}
 
 import scala.util.Try
 
@@ -15,7 +15,7 @@ class ServerSpec
     with FakeTCPChannels {
   implicit val ioRuntime: IORuntime = IORuntime.global
   test(
-    "Server writes successful response bytes to corresponding tcp connection channels"
+    "Server writes successful response bytes to corresponding finalproject.tcp connection channels"
   ) {
     val fakeTCPChannels: List[ReadWrite[IO]] = List(
       new ReadWrite[IO](getWithBodyStream),

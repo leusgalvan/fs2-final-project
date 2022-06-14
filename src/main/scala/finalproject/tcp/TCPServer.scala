@@ -1,4 +1,4 @@
-package tcp
+package finalproject.tcp
 
 import cats.effect._
 import fs2._

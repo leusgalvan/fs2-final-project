@@ -1,11 +1,12 @@
-import cats.effect._
-import server.Response.Ok
-import server._
+package finalproject
 
-/**
- * Test application that starts a server at port 29000 of localhost with a simple
- * request handler that just copies the body to the response.
- */
+import cats.effect.{IO, IOApp}
+import finalproject.server.Response.Ok
+import finalproject.server.{Request, Response, Server}
+
+/** Test application that starts a server at port 29000 of localhost with a simple
+  * request handler that just copies the body to the response.
+  */
 object Main extends IOApp.Simple {
   override def run: IO[Unit] = {
     val maxConnections = 1024

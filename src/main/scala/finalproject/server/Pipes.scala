@@ -1,4 +1,4 @@
-package server
+package finalproject.server
 
 import cats.{Functor, Show}
 import cats.effect.std.Console

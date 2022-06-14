@@ -1,6 +1,6 @@
-package fakes
+package finalproject.fakes
 
-import tcp._
+import finalproject.tcp._
 import cats.effect._
 import fs2._
 

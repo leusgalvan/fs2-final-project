@@ -1,8 +1,8 @@
-package fakes
+package finalproject.fakes
 
 import cats.Show
 import fs2.{Pipe, Stream}
-import server.{Pipes, Request}
+import finalproject.server.{Pipes, Request}
 
 trait FakePipes {
   def oneRequest[F[_]](r: Request): Pipes[F] = multipleRequests(List(r))

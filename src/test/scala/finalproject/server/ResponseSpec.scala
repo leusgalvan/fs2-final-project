@@ -1,6 +1,6 @@
-package server
+package finalproject.server
 
-import server.Response.Ok
+import finalproject.server.Response.Ok
 
 class ResponseSpec extends munit.FunSuite {
   test("Response is correctly encoded to bytes") {

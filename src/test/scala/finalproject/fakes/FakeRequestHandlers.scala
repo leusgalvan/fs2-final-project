@@ -1,8 +1,8 @@
-package fakes
+package finalproject.fakes
 
 import cats.{Applicative, ApplicativeError}
-import server.Response.Ok
-import server._
+import finalproject.server.Response.Ok
+import finalproject.server._
 
 trait FakeRequestHandlers {
   def echoRequestHandler[F[_]](implicit F: Applicative[F]): Request => F[Response] = (r: Request) =>

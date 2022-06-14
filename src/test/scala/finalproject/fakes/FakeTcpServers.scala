@@ -1,6 +1,6 @@
-package fakes
+package finalproject.fakes
 
-import tcp._
+import finalproject.tcp._
 import fs2._
 
 trait FakeTcpServers {

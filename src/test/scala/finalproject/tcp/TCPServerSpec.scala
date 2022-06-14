@@ -1,8 +1,8 @@
-package tcp
+package finalproject.tcp
 
 import cats.effect._
 import cats.effect.unsafe.IORuntime
-import fakes.{FakeServerSocketChannel, FakeSocketChannel}
+import finalproject.fakes.{FakeServerSocketChannel, FakeSocketChannel}
 
 import java.nio.channels.SocketChannel
 
