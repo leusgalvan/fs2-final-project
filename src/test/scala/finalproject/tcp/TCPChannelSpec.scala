@@ -1,8 +1,8 @@
-package tcp
+package finalproject.tcp
 
 import cats.effect._
 import cats.effect.unsafe.IORuntime
-import fakes.FakeSocketChannel
+import finalproject.fakes.FakeSocketChannel
 
 class TCPChannelSpec extends munit.FunSuite with FakeSocketChannel {
   implicit val ioRuntime: IORuntime = IORuntime.global

@@ -1,10 +1,10 @@
-package server
+package finalproject.server
 
 import cats.effect._
 import cats.effect.std._
 import fs2._
 import cats.implicits._
-import tcp.{TCPChannel, TCPServer}
+import finalproject.tcp.{TCPChannel, TCPServer}
 
 /**
  * An http server that will handle requests on a given host and port.

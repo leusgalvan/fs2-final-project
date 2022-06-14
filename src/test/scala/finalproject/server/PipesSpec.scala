@@ -1,9 +1,9 @@
-package server
+package finalproject.server
 
 import cats.implicits._
 import cats.effect._
 import cats.effect.unsafe.IORuntime
-import fakes.FakeRequests
+import finalproject.fakes.FakeRequests
 import fs2._
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop._

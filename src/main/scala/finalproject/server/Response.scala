@@ -1,4 +1,4 @@
-package server
+package finalproject.server
 
 import cats._
 
