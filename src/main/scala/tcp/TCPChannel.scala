@@ -40,12 +40,13 @@ object TCPChannel {
   ): TCPChannel[F] =
     new TCPChannel[F] {
       override def stream: Stream[F, Byte] = {
+        /**
+         * TODO #3
+         *
+         * Read one chunk of size 'bufferSize' from 'socketChannel'.
+         */
         val readChunk: F[Chunk[Byte]] =
-          Sync[F].blocking {
-            val byteBuffer: ByteBuffer = ByteBuffer.allocate(bufferSize)
-            socketChannel.read(byteBuffer)
-            Chunk.array(byteBuffer.array())
-          }
+          ???
 
         Stream.evalUnChunk(readChunk).repeat
       }

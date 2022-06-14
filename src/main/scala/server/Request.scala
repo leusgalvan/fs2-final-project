@@ -14,12 +14,14 @@ case class Request(
     body: Array[Byte]
 ) {
   /**
+   * TODO #1
+   *
    * Utility method for getting the content length of the request from the headers.
    *
    * If the header is not present or any error occurs, it returns 0.
    */
   def contentLength: Int =
-    headers.get("Content-Length").flatMap(_.toIntOption).getOrElse(0)
+    ???
 
   override def toString: String = Request.show.show(this)
 }

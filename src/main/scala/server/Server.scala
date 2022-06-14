@@ -51,16 +51,23 @@ object Server {
       tcpServer: TCPServer[F]
   ): Server[F] =
     new Server[F] {
-      def connectionStream(socket: TCPChannel[F]): Stream[F, Nothing] = {
-        socket.stream
-          .through(pipes.requests)
-          .through(pipes.log("[*] New request"))
-          .evalMap(handleRequest)
-          .through(pipes.log("[*] New response"))
-          .evalMap(r => socket.write(r.bytes))
-          .handleErrorWith(err => Stream.exec(Console[F].errorln(err.getMessage)))
-          .drain
-      }
+      /**
+       * TODO #6
+       *
+       * Read the bytes from this socket and transform them into http requests
+       * by using the requests pipe.
+       *
+       * Log each produced request with the label '[*] New request' for debugging purposes (use the log pipe).
+       *
+       * Handle each request with the provided function 'handleRequest' and log each produced response
+       * with the label '[*] New response'.
+       *
+       * Turn each response into bytes and write those bytes to the socket.
+       *
+       * Handle errors by logging the exception message to console (use the Console[F] instance).
+       */
+      def connectionStream(socket: TCPChannel[F]): Stream[F, Nothing] =
+        ???
 
       override def stream: Stream[F, Nothing] = {
         tcpServer.stream

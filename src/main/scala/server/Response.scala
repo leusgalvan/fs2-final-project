@@ -12,13 +12,12 @@ case class Response(
     headers: Map[String, String]
 ) {
   /**
+   * TODO #2
+   *
    * Transforms the response into a valid byte representation as per HTTP specs.
    */
   def bytes: Array[Byte] =
-    s"$httpVersion ${status.code} ${status.reason}\r\n".getBytes ++
-      headers.map { case (k, v) => s"$k: $v\r\n" }.mkString.getBytes ++
-      "\r\n".getBytes ++
-      body
+    ???
 
   /**
    * String representation of this response (mostly for debugging).

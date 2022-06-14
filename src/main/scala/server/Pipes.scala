@@ -55,18 +55,25 @@ object Pipes {
         s.pull.uncons.flatMap {
           case Some((chunk, restOfStream)) =>
             step match {
+              /**
+               * TODO #5
+               *
+               * Read bytes off this chunk up to the first SPACE.
+               *
+               * Create a String with those bytes and validate that it is a valid
+               * http method (use the 'validMethods' val defined above).
+               *
+               * If it is invalid, raise an error using Pull.raiseError; otherwise, move
+               * on to the next step with the remaining bytes.
+               *
+               * If the SPACE is not present in this chunk, append the chunk bytes to the buffer
+               * and continue recursively with the rest of the stream.
+               *
+               * Hint: look at step 1 for inspiration as it should be pretty similar.
+               */
               case 0 => // reading method
-                chunk.indexWhere(_ === SPACE) match {
-                  case Some(idx) =>
-                    val method = new String(buffer ++ chunk.take(idx).toArray)
-                    val newReq = request.copy(method = method)
-                    if (!validMethods.contains(method))
-                      Pull.raiseError(new Exception(s"Invalid method: $method"))
-                    else
-                      go(restOfStream.cons(chunk.drop(idx + 1)), step + 1, newReq, Array.empty)
-                  case None =>
-                    go(restOfStream, step, request, buffer ++ chunk.toArray)
-                }
+                ???
+
               case 1 => // reading url
                 chunk.indexWhere(_ === SPACE) match {
                   case Some(idx) =>
@@ -88,8 +95,7 @@ object Pipes {
               case 3 => // reading header
                 chunk.indexWhere(_ === LF) match {
                   case Some(idx) if idx > 1 || buffer.nonEmpty =>
-                    val headerStr =
-                      new String(buffer ++ chunk.take(idx - 1).toArray)
+                    val headerStr = new String(buffer ++ chunk.take(idx - 1).toArray)
                     val elems = headerStr.split(": ")
                     val newReq = request.copy(headers = request.headers + (elems(0) -> elems(1)))
                     go(restOfStream.cons(chunk.drop(idx + 1)), step, newReq, Array.empty)
