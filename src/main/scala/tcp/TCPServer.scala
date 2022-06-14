@@ -5,11 +5,30 @@ import fs2._
 import java.net._
 import java.nio.channels._
 
+/**
+ * A server that accepts tcp connections for a given host and port.
+ */
 trait TCPServer[F[_]] {
+  /**
+   * A stream of accepted tcp connections.
+   *
+   * We can handle reads and writes to this connection via its
+   * associated TCPChannel.
+   */
   def stream: Stream[F, TCPChannel[F]]
 }
 
 object TCPServer {
+  /**
+   * Creates a new tcp server that accepts connection on the given host and port.
+   *
+   * Each connection is automatically closed after used.
+   *
+   * Error handling should happen in each connection or else the server will go down.
+   *
+   * @param hostname e.g. 'localhost'
+   * @param port e.g. 29000
+   */
   def impl[F[_]: Sync](hostname: String, port: Int): TCPServer[F] = {
     val serverChannelResource: Resource[F, ServerSocketChannel] = {
       Resource.make(
@@ -23,6 +42,10 @@ object TCPServer {
     fromServerSocketChannelResource(serverChannelResource)
   }
 
+  /**
+   * Method to create a tcp server from a server socket channel without resource semantics.
+   * Should only be used in tests.
+   */
   def unsafeCreate[F[_]: Sync](channel: ServerSocketChannel): TCPServer[F] = {
     fromServerSocketChannelResource(Resource.pure[F, ServerSocketChannel](channel))
   }

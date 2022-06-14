@@ -1,20 +1,33 @@
 package server
 
-import cats.Functor
 import cats.effect._
 import cats.effect.std._
 import fs2._
-import fs2.io.net._
 import cats.implicits._
 import tcp.{TCPChannel, TCPServer}
 
-import java.nio.channels.SocketChannel
-
+/**
+ * An http server that will handle requests on a given host and port.
+ */
 trait Server[F[_]] {
+  /**
+   * An infinite stream that performs the handling of requests.
+   *
+   * It does not return any value and runs forever (unless some fatal error occurs).
+   */
   def stream: Stream[F, Nothing]
 }
 
 object Server {
+  /**
+   * Creates an http server.
+   *
+   * @param maxConnections the number of concurrent connections we can have at any point in time
+   * @param host e.g. 'localhost'
+   * @param port e.g. 29000
+   * @param handleRequest a function that handles a request and produces a response,
+   *                      possibly performing side-effects
+   */
   def apply[F[_]](
       maxConnections: Int,
       host: String,

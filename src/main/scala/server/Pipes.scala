@@ -5,12 +5,26 @@ import cats.effect.std.Console
 import cats.implicits._
 import fs2._
 
+/**
+ * Trait containing all the pipes.
+ */
 trait Pipes[F[_]] {
+  /**
+   * A pipe that logs every element of the input stream, appending
+   * the given label as a suffix.
+   */
   def log[A: Show](label: String): Pipe[F, A, A]
+
+  /**
+   * A pipe that parses a request from the given stream of bytes.
+   */
   def requests: Pipe[F, Byte, Request]
 }
 
 object Pipes {
+  /**
+   * Creates all the pipes for the given effect.
+   */
   def impl[F[_]](implicit
       console: Console[F],
       functor: Functor[F],
